@@ -36,7 +36,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     String welcomeMessage = _user != null
-        ? "Bienvenido a la aplicación, ${_user!.email}"
+        ? _user!.isAnonymous
+            ? "Bienvenido como invitado a la aplicación"
+            : "Bienvenido a la aplicación, ${_user!.email}"
         : "Usuario no autenticado";
 
     return Scaffold(

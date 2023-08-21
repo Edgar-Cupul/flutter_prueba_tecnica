@@ -89,6 +89,21 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
     return user;
   }
 
+  Future<User?> loginAsGuest(BuildContext context) async {
+    try {
+      UserCredential guestCredential =
+          await FirebaseAuth.instance.signInAnonymously();
+      User? guestUser = guestCredential.user;
+      return guestUser;
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Error al ingresar como invitado: $e"),
+        backgroundColor: Colors.red,
+      ));
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     TextEditingController _emailController = TextEditingController();
@@ -142,13 +157,12 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
             height: 26.0,
           ),
           TextField(
-            controller: _confirmPasswordController,
-            obscureText: true,
-            decoration: const InputDecoration(
-              hintText: "Confirma tu contraseña",
-              prefixIcon: Icon(Icons.check, color: Colors.black),
-            )
-          ),
+              controller: _confirmPasswordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                hintText: "Confirma tu contraseña",
+                prefixIcon: Icon(Icons.check, color: Colors.black),
+              )),
           const SizedBox(height: 12.0),
           const Text(
             "Completa el registro para acceder",
@@ -191,22 +205,28 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
               ),
             ),
           ),
+          SizedBox(
+            height: 20.0,
+          ),
+          TextButton(
+            onPressed: () async {
+              // Iniciar sesión como invitado
+              User? guestUser = await loginAsGuest(context);
+              if (guestUser != null) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                );
+              }
+            },
+            child: Text(
+              'Ingresar como invitado',
+              style: TextStyle(
+                color: Colors.blueAccent,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-}
-
-///
-class SignUpData {
-  final String email, password;
-
-  SignUpData({required this.email, required this.password});
-}
-
-class SignUpResponse {
-  final String? error;
-  final User? user;
-
-  SignUpResponse(this.error, this.user);
 }

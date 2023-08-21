@@ -9,7 +9,7 @@ import 'package:flutter_prueba_tecnica/register_screen.dart';
 void main() {
   runApp(const MyApp());
 }
-//Edited
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -104,20 +104,6 @@ class _VentanaLoginState extends State<VentanaLogin> {
     return user;
   }
 
-  Future<User?> loginAsGuest(BuildContext context) async {
-    try {
-      UserCredential guestCredential =
-          await FirebaseAuth.instance.signInAnonymously();
-      User? guestUser = guestCredential.user;
-      return guestUser;
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Error al ingresar como invitado: $e"),
-        backgroundColor: Colors.red,
-      ));
-      return null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -223,23 +209,6 @@ class _VentanaLoginState extends State<VentanaLogin> {
           ),
           const SizedBox(
             height: 24,
-          ),
-          TextButton(
-            onPressed: () async {
-              // Iniciar sesión como invitado
-              User? guestUser = await loginAsGuest(context);
-              if (guestUser != null) {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => ProfileScreen()),
-                );
-              }
-            },
-            child: Text(
-              'Ingresar como invitado',
-              style: TextStyle(
-                color: Colors.blueAccent,
-              ),
-            ),
           ),
         ],
       ),

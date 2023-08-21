@@ -9,7 +9,7 @@ import 'package:flutter_prueba_tecnica/register_screen.dart';
 void main() {
   runApp(const MyApp());
 }
-
+//Edited
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

@@ -110,7 +110,7 @@ class _VentanaLoginState extends State<VentanaLogin> {
                   content: SingleChildScrollView(
                     child: ListBody(
                       children: [
-                        Text('Use el formato correo@dom.com'),
+                        Text('Use el formato correo@dominio.com'),
                       ],
                     ),
                   ),
@@ -152,8 +152,8 @@ class _VentanaLoginState extends State<VentanaLogin> {
             break;
 
           default:
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Error no encontrado"),
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("Codigo de error" + e.code),
               backgroundColor: Colors.red,
             ));
             break;

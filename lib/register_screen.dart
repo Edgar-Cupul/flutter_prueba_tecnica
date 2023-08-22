@@ -86,12 +86,89 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
         user = userCredential.user;
         await userCredential.user!.updateDisplayName(name);
       } on FirebaseAuthException catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(e.message.toString()),
-          backgroundColor: Colors.red,
-        ));
-      } catch (e) {
-        print(e);
+        switch (e.code) {
+          case 'invalid-email':
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Correo inválido'),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: [
+                        Text('Use el formato correo@dominio.com'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                        child: Text('Entendido'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        }),
+                  ],
+                );
+              },
+            );
+            break;
+
+          case 'weak-password':
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Contraseña corta'),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: [
+                        Text('Su contraseña debe tener más de 5 caracteres'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                        child: Text('Entendido'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        }),
+                  ],
+                );
+              },
+            );
+            break;
+
+          case 'email-already-in-use':
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Correo electrónico usado'),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: [
+                        Text('Este correo electrónico ya se encuentra en uso'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                        child: Text('Entendido'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        }),
+                  ],
+                );
+              },
+            );
+            break;
+
+          default:
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Error no encontrado"),
+              backgroundColor: Colors.red,
+            ));
+            break;
+        }
       }
     } else {
       AlertDialog(
@@ -103,6 +180,14 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
             ],
           ),
         ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Entendido'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
       );
     }
     return user;
@@ -253,6 +338,11 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
                     context: context);
 
                 if (user != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content:
+                        Text("¡Registro exitoso!"),
+                    backgroundColor: Colors.green,
+                  ));
                   Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => HomePage()));
                 }

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_prueba_tecnica/main.dart';
 import 'package:flutter_prueba_tecnica/profile_screen.dart';
 
 //Ventana de registro
@@ -45,13 +46,17 @@ class ventanaRegistro extends StatefulWidget {
 
 class _ventanaRegistroState extends State<ventanaRegistro> {
   static Future<User?> createUserWithEmailAndPassword(
-      {required String email,
+      {required String name,
+      required String email,
       required String password,
       required String confirmPassword,
       required BuildContext context}) async {
     User? user;
 
-    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -72,6 +77,7 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
         user = userCredential.user;
+        await userCredential.user!.updateDisplayName(name);
       } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(e.message.toString()),
@@ -104,8 +110,28 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
     }
   }
 
+  Future<void> updateName(String name) async {
+    try {
+      // Obtiene el usuario actual
+      User? user = FirebaseAuth.instance.currentUser;
+      // Actualiza el nombre del usuario
+      await user?.updateDisplayName(name);
+      // Muestra un mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("¡Nombre de usuario actualizado correctamente!"),
+        backgroundColor: Colors.green,
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Error al registrar nombre de usuario"),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    TextEditingController _nameController = TextEditingController();
     TextEditingController _emailController = TextEditingController();
     TextEditingController _passwordController = TextEditingController();
     TextEditingController _confirmPasswordController = TextEditingController();
@@ -116,6 +142,16 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => HomePage()));
+            },
+          ),
+          const SizedBox(
+            height: 12.0,
+          ),
           const Text(
             "Digimob test",
             style: TextStyle(
@@ -135,6 +171,17 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
             height: 44.0,
           ),
           TextField(
+            controller: _nameController,
+            keyboardType: TextInputType.name,
+            decoration: const InputDecoration(
+              hintText: "Nombre",
+              prefixIcon: Icon(Icons.person, color: Colors.black),
+            ),
+          ),
+          const SizedBox(
+            height: 20.0,
+          ),
+          TextField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(
@@ -143,7 +190,7 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
             ),
           ),
           const SizedBox(
-            height: 26.0,
+            height: 20.0,
           ),
           TextField(
             controller: _passwordController,
@@ -154,7 +201,7 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
             ),
           ),
           const SizedBox(
-            height: 26.0,
+            height: 20.0,
           ),
           TextField(
               controller: _confirmPasswordController,
@@ -169,7 +216,7 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
             style: TextStyle(color: Colors.black),
           ),
           const SizedBox(
-            height: 88.0,
+            height: 80.0,
           ),
 
           /**
@@ -186,14 +233,15 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
               onPressed: () async {
                 //Probemos la aplicacion
                 User? user = await createUserWithEmailAndPassword(
+                    name: _nameController.text,
                     email: _emailController.text,
                     password: _passwordController.text,
                     confirmPassword: _confirmPasswordController.text,
                     context: context);
-                print(user);
+
                 if (user != null) {
                   Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => ProfileScreen()));
+                      MaterialPageRoute(builder: (context) => HomePage()));
                 }
               },
               child: const Text(
@@ -205,7 +253,7 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20.0,
           ),
           TextButton(

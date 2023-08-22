@@ -84,6 +84,13 @@ class _VentanaLoginState extends State<VentanaLogin> {
                 ],
               ),
             ),
+            actions: <Widget>[
+              TextButton(
+                  child: Text('Entendido'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  }),
+            ],
           );
         },
       );
@@ -93,10 +100,64 @@ class _VentanaLoginState extends State<VentanaLogin> {
             .signInWithEmailAndPassword(email: email, password: password);
         user = userCredential.user;
       } on FirebaseAuthException catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(e.message.toString()),
-          backgroundColor: Colors.red,
-        ));
+        switch (e.code) {
+          case 'invalid-email':
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Correo inválido'),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: [
+                        Text('Use el formato correo@dom.com'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                        child: Text('Entendido'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        }),
+                  ],
+                );
+              },
+            );
+            break;
+
+          case 'user-not-found':
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Usuario no encontrado'),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: [
+                        Text('Verifique los datos ingresados.'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                        child: Text('Entendido'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        }),
+                  ],
+                );
+              },
+            );
+            break;
+
+          default:
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Error no encontrado"),
+              backgroundColor: Colors.red,
+            ));
+            break;
+        }
       } catch (e) {
         print(e);
       }
@@ -104,12 +165,12 @@ class _VentanaLoginState extends State<VentanaLogin> {
     return user;
   }
 
-
   @override
   Widget build(BuildContext context) {
     //Text field controler
     TextEditingController _emailController = TextEditingController();
     TextEditingController _passwordController = TextEditingController();
+
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: Column(
@@ -154,25 +215,27 @@ class _VentanaLoginState extends State<VentanaLogin> {
             ),
           ),
           const SizedBox(height: 12.0),
-          const Text(
-            "Si aún no tienes una cuenta...",
-            style: TextStyle(color: Colors.black),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => RegisterScreen()));
-            },
-            child: Text(
-              '¡Crea una!',
-              style: TextStyle(
-                color: Colors.blueAccent,
-                decoration: TextDecoration.underline,
+          Row(children: [
+            const Text(
+              "Si aún no tienes una cuenta...",
+              style: TextStyle(color: Colors.black),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => RegisterScreen()));
+              },
+              child: Text(
+                '¡Crea una!',
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
-          ),
+          ]),
           const SizedBox(
-            height: 88.0,
+            height: 80.0,
           ),
 
           /**
@@ -192,12 +255,11 @@ class _VentanaLoginState extends State<VentanaLogin> {
                     email: _emailController.text,
                     password: _passwordController.text,
                     context: context);
-                print(user);
                 if (user != null) {
                   Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => ProfileScreen()));
-                }
-              },
+                } //endif
+              }, //On pressed
               child: const Text(
                 "Ingresar",
                 style: TextStyle(

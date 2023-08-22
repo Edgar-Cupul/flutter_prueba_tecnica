@@ -38,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String welcomeMessage = _user != null
         ? _user!.isAnonymous
             ? "Bienvenido como invitado a la aplicación"
-            : "Bienvenido a la aplicación, ${_user!.email}"
+            : "Bienvenido a la aplicación, ${_user!.displayName}"
         : "Usuario no autenticado";
 
     return Scaffold(

@@ -69,6 +69,13 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
                 ],
               ),
             ),
+            actions: <Widget>[
+              TextButton(
+                  child: Text('Entendido'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  }),
+            ],
           );
         },
       );
@@ -87,10 +94,16 @@ class _ventanaRegistroState extends State<ventanaRegistro> {
         print(e);
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Las contraseñas no coinciden, verifica"),
-        backgroundColor: Colors.amber,
-      ));
+      AlertDialog(
+        title: Text('Contraseñas distintas'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: [
+              Text('Verifique que las contraseñas coincidan'),
+            ],
+          ),
+        ),
+      );
     }
     return user;
   }
